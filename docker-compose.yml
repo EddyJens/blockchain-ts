@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3001:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules  # prevent local node_modules conflict
+    environment:
+      - NODE_ENV=development
+      - TS_NODE_DEV=true
