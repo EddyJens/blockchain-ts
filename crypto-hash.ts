@@ -8,4 +8,4 @@ const cryptoHash = (...inputs: any[]) => {
     return hash.digest('hex')
 }
 
-export default cryptoHash;
+export default cryptoHash

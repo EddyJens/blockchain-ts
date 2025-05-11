@@ -1,5 +1,6 @@
 import Blockchain from './blockchain'
 import Block from './block'
+import cryptoHash from './crypto-hash'
 
 describe('Blockchain', () => {
     let blockchain: any, newChain: any, originalChain: any
@@ -20,7 +21,7 @@ describe('Blockchain', () => {
     })
 
     it('adds a new block to the chain', () => {
-        const newData = 'foo bar'
+        const newData = ['foo bar']
         blockchain.addBlock({ data: newData })
         
         expect(blockchain.chain[blockchain.chain.length - 1].data).toEqual(newData)
@@ -38,9 +39,9 @@ describe('Blockchain', () => {
         describe('when the chain starts with the genesis block and has multiple blocks', () => {
 
             beforeEach(() => {
-                blockchain.addBlock({ data: 'foo' })
-                blockchain.addBlock({ data: 'bar' })
-                blockchain.addBlock({ data: 'baz' })
+                blockchain.addBlock({ data: ['foo'] })
+                blockchain.addBlock({ data: ['bar'] })
+                blockchain.addBlock({ data: ['baz'] })
             })
 
             describe('and a lastHash reference has changed', () => {
@@ -55,6 +56,23 @@ describe('Blockchain', () => {
                 it('returns false', () => {
                     blockchain.chain[2].data = 'some-bad-and-evil-data'
 
+                    expect(Blockchain.isValidChain(blockchain.chain)).toBe(false)
+                })
+            })
+
+            describe('and the chain contains a block with a jump in difficulty', () => {
+                it('returns false', () => {
+                    const lastBlock = blockchain.chain[blockchain.chain.length - 1]
+                    const lastHash = lastBlock.hash
+                    const timestamp = Date.now()
+                    const nonce = 0
+                    const data = ['foo']
+                    const difficulty = lastBlock.difficulty - 3
+                    const hash = cryptoHash(timestamp, lastHash, nonce, difficulty, data)
+                    const badBlock = new Block({
+                        timestamp, lastHash, difficulty, hash, nonce, data
+                    })
+                    blockchain.chain.push(badBlock)
                     expect(Blockchain.isValidChain(blockchain.chain)).toBe(false)
                 })
             })
@@ -97,9 +115,9 @@ describe('Blockchain', () => {
 
         describe('when the new chain is longer', () => {
             beforeEach(() => {
-                newChain.addBlock({ data: 'foo' })
-                newChain.addBlock({ data: 'bar' })
-                newChain.addBlock({ data: 'baz' })
+                newChain.addBlock({ data: ['foo'] })
+                newChain.addBlock({ data: ['bar'] })
+                newChain.addBlock({ data: ['baz'] })
             })
 
             describe('and the chain is invalid', () => {
