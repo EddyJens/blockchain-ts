@@ -3,7 +3,7 @@ import Block from './block'
 import cryptoHash from './crypto-hash'
 
 describe('Blockchain', () => {
-    let blockchain: any, newChain: any, originalChain: any
+    let blockchain: Blockchain, newChain: Blockchain, originalChain: Block[]
 
     beforeEach(() => {
         blockchain = new Blockchain()
@@ -30,7 +30,14 @@ describe('Blockchain', () => {
     describe('isValidChain', () => {
         describe('when the chain does not start with the genesis block', () => {
             it('returns false', () => {
-                blockchain.chain[0] = { data: 'bad data' }
+                blockchain.chain[0] = {
+                    timestamp: 1,
+                    lastHash: 'foo-hash',
+                    hash: 'bar-hash',
+                    nonce: 1,
+                    difficulty: 1,
+                    data: ['bad data']
+                }
                 
                 expect(Blockchain.isValidChain(blockchain.chain)).toBe(false)
             })
@@ -54,7 +61,7 @@ describe('Blockchain', () => {
 
             describe('and the chain contains a block with an invalid field', () => {
                 it('returns false', () => {
-                    blockchain.chain[2].data = 'some-bad-and-evil-data'
+                    blockchain.chain[2].data = ['some-bad-and-evil-data']
 
                     expect(Blockchain.isValidChain(blockchain.chain)).toBe(false)
                 })
@@ -99,7 +106,14 @@ describe('Blockchain', () => {
 
         describe('when the new chain is not longer', () => {
             beforeEach(() => {
-                newChain.chain[0] = { hash: 'chain' }
+                newChain.chain[0] = {
+                    timestamp: 1,
+                    lastHash: 'foo-hash',
+                    nonce: 1,
+                    difficulty: 1,
+                    data: ['bad data'],
+                    hash: 'chain' 
+                }
         
                 blockchain.replaceChain(newChain.chain)
             })

@@ -6,19 +6,19 @@ import hexToBinary from 'hex-to-binary'
 
 interface BlockProps {
     timestamp: number
-    lastHash?: string
+    lastHash: string
     hash: string
-    data?: string[]
-    nonce?: number
+    data: string[]
+    nonce: number
     difficulty: number
 }
 
 class Block {
     timestamp: number
-    lastHash?: string
+    lastHash: string
     hash: string
-    data?: string[]
-    nonce?: number
+    data: string[]
+    nonce: number
     difficulty: number
 
     constructor({ timestamp, lastHash, hash, data, nonce, difficulty }: BlockProps) {

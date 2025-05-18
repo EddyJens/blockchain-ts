@@ -3,9 +3,57 @@ services:
     build: .
     ports:
       - "3001:3000"
+    env_file:
+      - .env
     volumes:
       - .:/app
       - /app/node_modules  # prevent local node_modules conflict
     environment:
       - NODE_ENV=development
       - TS_NODE_DEV=true
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - blockchain
+
+  # app1:
+  #   build: .
+  #   ports:
+  #     - "3002:3000"
+  #   env_file:
+  #     - .env
+  #   volumes:
+  #     - .:/app
+  #     - /app/node_modules  # prevent local node_modules conflict
+  #   environment:
+  #     - NODE_ENV=development
+  #     - TS_NODE_DEV=true
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+  #   networks:
+  #     - blockchain
+
+  redis:
+    image: redis:8.0.1
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+    networks:
+      - blockchain
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s 
+
+networks:
+  blockchain:
+
+volumes:
+  redis_data:
