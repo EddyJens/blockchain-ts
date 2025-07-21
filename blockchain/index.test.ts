@@ -1,6 +1,6 @@
-import Blockchain from './blockchain'
+import Blockchain from './index'
 import Block from './block'
-import cryptoHash from './crypto-hash'
+import cryptoHash from '../util/crypto-hash'
 
 describe('Blockchain', () => {
     let blockchain: Blockchain, newChain: Blockchain, originalChain: Block[]
@@ -153,7 +153,7 @@ describe('Blockchain', () => {
                     blockchain.replaceChain(newChain.chain)
                 })
 
-                it('replaces the chain', () => {                    
+                it('replaces the chain', () => {
                     expect(blockchain.chain).toEqual(newChain.chain)
                 })
 

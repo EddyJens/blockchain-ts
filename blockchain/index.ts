@@ -1,5 +1,5 @@
 import Block from "./block"
-import cryptoHash from "./crypto-hash"
+import cryptoHash from "../util/crypto-hash"
 
 class Blockchain {
     chain: Block[]

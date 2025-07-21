@@ -5,6 +5,7 @@ services:
       - "3001:3000"
     env_file:
       - .env
+    restart: always
     volumes:
       - .:/app
       - /app/node_modules  # prevent local node_modules conflict
@@ -38,6 +39,7 @@ services:
   redis:
     image: redis:8.0.1
     container_name: redis
+    restart: always
     ports:
       - "6379:6379"
     volumes:

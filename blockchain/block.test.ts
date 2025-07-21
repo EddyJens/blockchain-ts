@@ -1,6 +1,6 @@
 import Block from './block'
-import cryptoHash from './crypto-hash'
-import { GENESIS_DATA, MINE_RATE } from './config'
+import cryptoHash from '../util/crypto-hash'
+import { GENESIS_DATA, MINE_RATE } from '../config'
 
 //@ts-ignore 
 import hexToBinary from 'hex-to-binary'

@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express'
 import bodyParser from 'body-parser'
 import axios from 'axios'
 import Blockchain from './blockchain'
-import PubSub from './pubsub'
+import PubSub from './app/pubsub'
 
 const app = express()
 const blockchain = new Blockchain()
