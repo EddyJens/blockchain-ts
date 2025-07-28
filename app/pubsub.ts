@@ -1,18 +1,23 @@
 import { RedisClientType, createClient } from 'redis'
 import Blockchain from '../blockchain'
+import TransactionPool from '../wallet/transaction-pool'
+import Transaction from '../wallet/transaction'
 
 const CHANNELS = {
     TEST: 'TEST',
-    BLOCKCHAIN: 'BLOCKCHAIN'
+    BLOCKCHAIN: 'BLOCKCHAIN',
+    TRANSACTION: 'TRANSACTION'
 }
 
 class PubSub {
     publisher: RedisClientType
     subscriber: RedisClientType
     blockchain: Blockchain
+    transactionPool: TransactionPool
 
-    constructor(blockchain: Blockchain) {
+    constructor({blockchain, transactionPool}: { blockchain: Blockchain, transactionPool: TransactionPool }) {
         this.blockchain = blockchain
+        this.transactionPool = transactionPool
     }
 
     async init() {
@@ -42,8 +47,15 @@ class PubSub {
 
         const parsedMessage = JSON.parse(message)
 
-        if (channel === CHANNELS.BLOCKCHAIN) {
-            this.blockchain.replaceChain(parsedMessage)
+        switch (channel) {
+            case CHANNELS.BLOCKCHAIN:
+                this.blockchain.replaceChain(parsedMessage)
+                break
+            case CHANNELS.TRANSACTION:
+                this.transactionPool.setTransaction(parsedMessage)
+                break
+            default:
+                return
         }
     }
 
@@ -73,6 +85,13 @@ class PubSub {
         this.publish({
             channel: CHANNELS.BLOCKCHAIN,
             message: JSON.stringify(this.blockchain.chain)
+        })
+    }
+
+    broadcastTransaction(transaction: Transaction) {
+        this.publish({
+            channel: CHANNELS.TRANSACTION,
+            message: JSON.stringify(transaction)
         })
     }
 }
