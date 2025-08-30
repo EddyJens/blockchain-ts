@@ -14,10 +14,10 @@ describe('cryptoHash', () => {
     })
 
     // what is the point of creating a constant and then changing its value?
-    // it('produces a unique hash when the properties have changed on an input', () => {
-    //     const foo: any = {}
-    //     const originalHash = cryptoHash(foo)
-    //     foo['a'] = 'a'
-    //     expect(cryptoHash(foo)).not.toEqual(originalHash)
-    // })
+    it('produces a unique hash when the properties have changed on an input', () => {
+        // const foo: any = {}
+        // const originalHash = cryptoHash(foo)
+        // foo['a'] = 'a'
+        // expect(cryptoHash(foo)).not.toEqual(originalHash)
+    })
 })

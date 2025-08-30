@@ -1,5 +1,8 @@
 import Block from "./block"
 import cryptoHash from "../util/crypto-hash"
+import { MINING_REWARD, REWARD_INPUT } from "../config"
+import Transaction from "../wallet/transaction"
+import Wallet from "../wallet"
 
 class Blockchain {
     chain: Block[]
@@ -8,7 +11,7 @@ class Blockchain {
         this.chain = [Block.genesis()]
     }
 
-    addBlock({ data }: { data: string[] }) {
+    addBlock({ data }: { data: any }) {
         const newBlock = Block.mineBlock({
             lastBlock: this.chain[this.chain.length - 1],
             data
@@ -17,7 +20,7 @@ class Blockchain {
         this.chain.push(newBlock)
     }
 
-    replaceChain(chain: Block[]) {
+    replaceChain(chain: Block[], validateTransactions?: any, onSuccess?: any) {
         if (chain.length <= this.chain.length) {
             console.error('The incoming chain must be longer')
             return
@@ -27,9 +30,63 @@ class Blockchain {
             console.error('The incoming chain must be valid')
             return
         }
+
+        if (validateTransactions && !this.validTransactionData({ chain })) {
+            console.error('The incoming chain has invalid data')
+            return
+        }
         
+        if (onSuccess) onSuccess()
         console.log('Replacing chain with', chain)
         this.chain = chain
+    }
+
+    validTransactionData({ chain }: { chain: Block[] }) {
+        for (let i = 1; i < chain.length; i++) {
+            const block = chain[i]
+            const transactionSet = new Set()
+            let rewardTransactionCount = 0
+
+            for (let transaction of block.data) {
+                if (transaction.input.address === REWARD_INPUT.address) {
+                    rewardTransactionCount += 1
+
+                    if (rewardTransactionCount > 1) {
+                        console.error('Miner rewards exceed limit')
+                        return false
+                    }
+
+                    if (Object.values(transaction.outputMap)[0] !== MINING_REWARD) {
+                        console.error('Miner reward amount is invalid')
+                        return false
+                    }
+                } else {
+                    if (!Transaction.validTransaction(transaction)) {
+                        console.error('Invalid transaction')
+                        return false
+                    }
+
+                    const trueBalance = Wallet.calculateBalance({
+                        chain: this.chain,
+                        address: transaction.input.address
+                    })
+
+                    if (transaction.input.amount !== trueBalance) {
+                        console.error('Invalid input amount')
+                        return false
+                    }
+
+                    if (transactionSet.has(transaction)) {
+                        console.error('An identical transaction appears more than once in the block')
+                        return false
+                    } else {
+                        transactionSet.add(transaction)
+                    }
+                }
+            }
+        }
+
+        return true
     }
 
     static isValidChain(chain: Block[]) {

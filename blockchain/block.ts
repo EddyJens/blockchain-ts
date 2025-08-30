@@ -8,7 +8,7 @@ interface BlockProps {
     timestamp: number
     lastHash: string
     hash: string
-    data: string[]
+    data: any
     nonce: number
     difficulty: number
 }
@@ -17,7 +17,7 @@ class Block {
     timestamp: number
     lastHash: string
     hash: string
-    data: string[]
+    data: any
     nonce: number
     difficulty: number
 
@@ -34,7 +34,7 @@ class Block {
         return new Block(GENESIS_DATA)
     }
 
-    static mineBlock({lastBlock, data}: {lastBlock: Block, data: string[]}): Block {
+    static mineBlock({lastBlock, data}: {lastBlock: Block, data: any}): Block {
         const lastHash = lastBlock.hash
         let hash, timestamp
         let { difficulty } = lastBlock

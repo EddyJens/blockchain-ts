@@ -2,16 +2,25 @@ import { v1 as uuid } from 'uuid'
 import Wallet from './index'
 import { OutputMapObject } from '../types'
 import { verifySignature } from '../util'
+import { MINING_REWARD, REWARD_INPUT } from '../config'
+
+interface TransactionParams {
+    senderWallet: Wallet
+    recipient: number
+    amount: number
+    outputMap?: any
+    input?: any
+}
 
 class Transaction {
     id: string
-    outputMap: OutputMapObject
+    outputMap: any
     input: any
 
-    constructor(senderWallet: Wallet, recipient: number, amount: number) {
+    constructor({senderWallet, recipient, amount, outputMap, input}: TransactionParams) {
         this.id = uuid()
-        this.outputMap = this.createOutputMap(senderWallet, recipient, amount)
-        this.input = this.createInput(senderWallet, this.outputMap)
+        this.outputMap = outputMap || this.createOutputMap(senderWallet, recipient, amount)
+        this.input = input || this.createInput({senderWallet, outputMap: this.outputMap})
     }
 
     createOutputMap(senderWallet: Wallet, recipient: number, amount: number) {
@@ -27,7 +36,7 @@ class Transaction {
         return outputMap
     }
 
-    createInput(senderWallet: Wallet, outputMap: OutputMapObject) {
+    createInput({senderWallet, outputMap} : {senderWallet: Wallet, outputMap: OutputMapObject}) {
         return {
             timestamp: Date.now(),
             amount: senderWallet.balance,
@@ -36,7 +45,7 @@ class Transaction {
         }
     }
 
-    update({senderWallet, recipient, amount } : {senderWallet: Wallet, recipient: number, amount: number}) {
+    update({senderWallet, recipient, amount } : {senderWallet: Wallet, recipient: any, amount: number}) {
 
         if (amount > this.outputMap.senderWallet!.publicKey) {
             throw new Error('Amount exceeds balance')
@@ -51,14 +60,16 @@ class Transaction {
         this.outputMap.senderWallet = senderWallet
         this.outputMap.senderWallet.publicKey = this.outputMap.senderWallet.publicKey - amount
 
-        this.input = this.createInput(senderWallet, this.outputMap)
+        this.input = this.createInput({senderWallet, outputMap: this.outputMap})
     }
 
     static validTransaction(transaction: Transaction) {
         const { input: { address, amount, signature}, outputMap } = transaction
 
+        // TODO: solve types to avoid number conversion
         const outputTotal = Object.values(outputMap).reduce(
-            (total: number, outputAmount: number) => total + outputAmount
+            (total, outputAmount) => (total as number) + (outputAmount as number),
+            0
         )
 
         if (amount !== outputTotal) {
@@ -72,6 +83,18 @@ class Transaction {
         }
 
         return true
+    }
+
+    static rewardTransaction({ minerWallet }: { minerWallet: Wallet }): Transaction {
+        return new this({
+            senderWallet: minerWallet,
+            recipient: 0,
+            amount: 0,
+            input: REWARD_INPUT,
+            outputMap: {
+                [minerWallet.publicKey]: MINING_REWARD
+            }
+        })
     }
 }
 
