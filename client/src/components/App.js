@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import Blocks from './Blocks'
-import logo from '..assets/logo.png'
+import { Link } from 'react-router-dom'
+import logo from '../assets/logo.png'
 
 class App extends Component {
 
@@ -13,7 +13,7 @@ class App extends Component {
 
     componentDidMount() {
         fetch(
-            'http://localhost:3001/api/wallet-info'
+            `${document.location.origin}/api/wallet-info`
         ).then(
             response => response.json()
         ).then(
@@ -33,12 +33,14 @@ class App extends Component {
                     Welcome to the blockchain...
                 </div>
                 <br />
+                <div><Link to="/blocks">Blocks</Link></div>
+                <div><Link to="/conduct-transaction">Conduct a Transaction</Link></div>
+                <div><Link to="/transaction-pool">Transaction Pool</Link></div>
+                <br />
                 <div className='WalletInfo'>
                     <div>Address: {address}</div>
                     <div>Balance: {balance}</div>
                 </div>
-                <br />
-                <Blocks />
             </div>
         )
     }

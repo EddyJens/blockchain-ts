@@ -17,9 +17,12 @@
     "elliptic": "^6.6.1",
     "express": "^5.1.0",
     "hex-to-binary": "^1.0.1",
+    "history": "^5.3.0",
     "parcel-bundler": "^1.12.5",
     "react": "^19.1.1",
+    "react-bootstrap": "^2.10.10",
     "react-dom": "^19.1.1",
+    "react-router-dom": "^7.8.2",
     "redis": "^5.0.1",
     "uuid": "^11.1.0"
   },
