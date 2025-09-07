@@ -14,18 +14,23 @@ class PubSub {
     subscriber: RedisClientType
     blockchain: Blockchain
     transactionPool: TransactionPool
+    redisUrl: string
 
-    constructor({blockchain, transactionPool}: { blockchain: Blockchain, transactionPool: TransactionPool }) {
+    constructor(
+        {blockchain, transactionPool, redisUrl}:
+        { blockchain: Blockchain, transactionPool: TransactionPool, redisUrl: string }
+    ) {
         this.blockchain = blockchain
         this.transactionPool = transactionPool
+        this.redisUrl = redisUrl
     }
 
     async init() {
         this.publisher = createClient({
-            url: 'redis://redis:6379'
+            url: this.redisUrl
         })
         this.subscriber = createClient({
-            url: 'redis://redis:6379'
+            url: this.redisUrl
         })
 
         this.publisher.on('error', (err) => console.error('Redis Client Error:', err))

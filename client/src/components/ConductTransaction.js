@@ -4,7 +4,13 @@ import { Link } from 'react-router-dom'
 import history from '../history'
 
 class ConductTransaction extends Component {
-    state = { recipient: '', amount: 0 }
+    state = { recipient: '', amount: 0, knownAddresses: [] }
+
+    componentDidMount() {
+        fetch(`${document.location.origin}/api/known-addresses`)
+            .then(response => response.json())
+            .then(json => this.setState({ knownAddresses: json }))
+    }
 
     updateRecipient = event => {
         this.setState({ recipient: event.target.value })
@@ -35,6 +41,21 @@ class ConductTransaction extends Component {
             <div className="ConductTransaction">
                 <Link to="/">Home</Link>
                 <h3>Conduct a Transaction</h3>
+                <br />
+                <h4>Known Addresses</h4>
+                {
+                    this.state.knownAddresses.map(
+                        knownAddresses => {
+                            return (
+                                <div key={knownAddresses}>
+                                    <div>{knownAddresses}</div>
+                                    <br />
+                                </div>
+                            )
+                        }
+                    )
+                }
+                <br />
                 <FormGroup>
                     <FormControl
                         input="text"

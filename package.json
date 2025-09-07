@@ -4,6 +4,7 @@
   "license": "MIT",
   "author": "Eddy Zavala",
   "scripts": {
+    "start": "npm run build-client && node index.js",
     "dev": "yarn dev-client & npx ts-node-dev --respawn --transpile-only --poll index.ts",
     "test": "jest --watchAll",
     "build-client": "yarn clean && parcel build client/src/index.html --out-dir client/dist",
